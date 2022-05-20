@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+    <title>京东商品爬取</title>
+    <link rel="icon" href="http://static.lqjai.com/qjmall/img/favicon.ico">
+
+    <link rel="stylesheet" type="text/css" href="http://static.lqjai.com/qjmall/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="http://static.lqjai.com/qjmall/css/pages-sampling.css" />
+    <link rel="stylesheet" type="text/css" href="http://static.lqjai.com/qjmall/plugins/elementui/index.css" />
+    <style>
+        .content p{
+            font-size: 25px;
+            line-height: 25px;
+        }
+    </style>
+</head>
+
+<body>
+	<!--页面顶部-->
+	<div id="header"></div>
+
+    <!--供应商-->
+    <div class="banner"></div>
+    <div id="app" class="sampling">
+        <div class="py-container">
+            <div class="title" style="color: #ff713f; align-content: center">
+                <h1>京东商品爬取</h1>
+            </div>
+            <template>
+                <el-carousel :interval="4000" type="card" height="320px" width="640px">
+                    <el-carousel-item :key="1">
+                        <img width="320px" height="320px" src="http://static.lqjai.com/qjmall/img/guide/%E5%8D%83%E5%8D%83%E7%A7%91%E6%8A%80.png"/>
+                    </el-carousel-item>
+                    <el-carousel-item :key="2">
+                        <img width="320px" height="320px" src="http://static.lqjai.com/qjmall/img/guide/dh20220418155522.png"/>
+                    </el-carousel-item>
+                    <el-carousel-item :key="3">
+                        <img width="320px" height="320px" src="http://static.lqjai.com/qjmall/img/guide/dh20220418155625.png"/>
+                    </el-carousel-item>
+                    <el-carousel-item :key="4">
+                        <img width="320px" height="320px" src="http://static.lqjai.com/qjmall/img/guide/qrcode.jpg"/>
+                    </el-carousel-item>
+
+                </el-carousel>
+            </template>
+            <h1 style="color: #ff713f; align-content: center">京东地址：<a href="https://www.jd.com/" target="_blank">https://www.jd.com/</a> </h1>
+            <div class="content">
+                <div class="item" style="text-align:center;background: cornsilk">
+                    <el-alert
+                            title="爬取商品列表"
+                            type="success"
+                            center
+                            :closable="false"
+                            show-icon>
+                    </el-alert>
+                    <span style="color: red;font-size: 20px;">{{msg1}}</span>
+                    <h1 class="center">请输入cookie值</h1>
+                    <el-input style="width: 90%"
+                            type="textarea"
+                              :rows="3"
+                            placeholder="请输入cookie值"
+                            v-model="params.cookies"
+                            show-word-limit>
+                    </el-input>
+                    <h1 class="center">请输入文件存储路径</h1>
+                    <el-input style="width: 90%"
+                              type="textarea"
+                              placeholder="请输入文件存储路径"
+                              v-model="params.storage"
+                              show-word-limit>
+                    </el-input>
+                    <h1 class="center">请输入商品列表的链接【包含 search.jd.com 域名】</h1>
+                    <el-input style="width: 90%"
+                              type="textarea"
+                              placeholder="请输入商品列表的链接【包含 search.jd.com 域名】"
+                              v-model="params.listUrl"
+                              show-word-limit>
+                    </el-input>
+                    <br><br><el-button type="primary" @click="crawList()" :loading="listLoad">爬取商品列表</el-button>
+                </div>
+                <el-divider></el-divider><br><br>
+                <div class="item" style="text-align:center;background: cornsilk">
+                    <el-alert
+                            title="爬取商品详情"
+                            type="success"
+                            center
+                            :closable="false"
+                            show-icon>
+                    </el-alert>
+                    <span style="color: red;font-size: 20px;">{{msg2}}</span>
+                    <h1 class="center">请输入cookie值</h1>
+                    <el-input style="width: 90%"
+                              type="textarea"
+                              :rows="3"
+                              placeholder="请输入cookie值"
+                              v-model="params.cookies"
+                              show-word-limit>
+                    </el-input>
+                    <h1 class="center">请输入文件存储路径</h1>
+                    <el-input style="width: 90%"
+                              type="textarea"
+                              placeholder="请输入文件存储路径"
+                              v-model="params.storage"
+                              show-word-limit>
+                    </el-input>
+                    <h1 class="center">请输入商品详情链接【包含 item.jd.com 域名】</h1>
+                    <el-input style="width: 90%"
+                              type="textarea"
+                              placeholder="请输入商品详情链接【包含 item.jd.com 域名】"
+                              v-model="params.itemUrl"
+                              show-word-limit>
+                    </el-input>
+                    <br><br><el-button type="primary" @click="crawItem()" :loading="itemLoad">爬取商品详情</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<!--页面底部-->
+	<div id="footer"></div>
+	<!--页面底部END-->
+
+</body>
+
+<!--引入脚本-->
+<script src="http://static.lqjai.com/qjmall/js/vue.js"></script>
+<script type="text/javascript" src="http://static.lqjai.com/qjmall/js/plugins/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="http://static.lqjai.com/qjmall/plugins/elementui/index.js"></script>
+<!-- 引入组件库 -->
+<script src="http://static.lqjai.com/qjmall/js/axios.js"></script>
+<script>
+
+    var app = new Vue({
+        el:"#app",
+        data:{
+            params:{
+                listUrl:"",
+                itemUrl:"",
+                cookies:"",
+                storage:"F:\\temp\\crawler",
+                html:"",
+                single:""
+            },
+            msg1:"",
+            msg2:"",
+            listLoad:false,
+            itemLoad:false
+        },
+        methods:{
+            crawList(){
+                app.listLoad = true;
+                axios.post("/crawler/list",this.params).then((res)=>{
+                    if(res.data.flag){
+                        app.$message.success(res.data.data);
+                        app.msg1 = res.data.data;
+                    }else {
+                        app.$message.error(res.data.message);
+                        app.msg1 = res.data.message;
+                    }
+                    app.listLoad = false;
+                })
+            },
+            crawItem(){
+                app.itemLoad = true;
+                axios.post("/crawler/item",this.params).then((res)=>{
+                    if(res.data.flag){
+                        app.$message.success(res.data.data);
+                        app.msg2 = res.data.data;
+                    }else {
+                        app.$message.error(res.data.message);
+                        app.msg2 = res.data.message;
+                    }
+                    app.itemLoad = false;
+                })
+            },
+        },
+        created:function (){
+        }
+    });
+</script>
+</html>

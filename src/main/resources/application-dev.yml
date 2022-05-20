@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: crawler
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://lqjai.com:3306/mall_goods?serverTimezone=Asia/Shanghai
+    username: zhangsan
+    password: 6666666
+
+qiniu:
+  storage: false #是否开启本地存储
+  ossStorage: false #是否开启七牛云存储
+  accessKey: Jm9_djiofs16bXsFtWOSxMUvBJa3Rxp3wA0N0poH
+  secretKey: 4hRBlT6DM_dBdUoLw8eMSu55kYiacl0Fzb2ZKn0J
+  bucket: kili  #空间名称
+  file:
+    url: http://oss.lqjai.cn/
+    path: qjmall/img/goods/
